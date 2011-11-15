@@ -1,6 +1,7 @@
 # SmartyPants
 
 A simple game using
+
 * [Arduino Mega 2560](http://arduino.cc/en/Main/ArduinoBoardMega2560)
 * [Android SDK](http://developer.android.com/sdk/)
 
