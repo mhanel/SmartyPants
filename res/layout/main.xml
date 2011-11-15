@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:gravity = "center"
+        android:id="@+id/debugfield"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="3dip" />
+
+    <Button
+        android:id="@+id/buttonStart"
+        android:layout_gravity="center"
+        android:layout_marginBottom="40px"
+        android:layout_width="412px"
+        android:tag="stopped"
+        android:layout_height="wrap_content"
+        android:text="Start game!" />
+
+    <TextView
+        android:id="@+id/textColor"
+        android:layout_gravity="center"
+        android:layout_marginBottom="40px"
+        android:layout_width="400px"
+        android:layout_height="300px"
+        android:background="#fff"
+        android:gravity="center"
+        android:text="COLOR"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="#000"
+        android:textSize="70px" />
+
+    <TextView
+        android:gravity="center"
+        android:id="@+id/textStatus"
+        android:layout_gravity="center"
+        android:layout_marginBottom="20px"
+        android:layout_width="400px"
+        android:layout_height="wrap_content"
+        android:text="Schwammerl"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:progress="50"
+        android:layout_gravity="center"
+        android:layout_width="420px"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>
