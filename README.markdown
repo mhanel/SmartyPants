@@ -10,4 +10,4 @@ Project for [Vienna University of Technology](http://www.tuwien.ac.at/) by Lucia
 ## Changelog
 
 ###Version 1.0 (2011-11-15)
-* tbd
+* working release for project deadline
