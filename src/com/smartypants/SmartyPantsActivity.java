@@ -4,6 +4,7 @@ import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Random;
 
 import com.android.future.usb.UsbAccessory;
 import com.android.future.usb.UsbManager;
@@ -15,6 +16,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -23,6 +25,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 
@@ -37,6 +40,11 @@ public class SmartyPantsActivity extends Activity implements Runnable, OnClickLi
 	
 	private TextView debugtext = null;
 	private Button buttonStart = null;
+	private TextView textStatus = null;
+	private TextView textColor = null;
+	private ProgressBar progressBar = null;
+	
+	private String whatColor = "";
 
 	UsbAccessory mAccessory;
 	ParcelFileDescriptor mFileDescriptor;
@@ -87,8 +95,10 @@ public class SmartyPantsActivity extends Activity implements Runnable, OnClickLi
     	setContentView(R.layout.main);
     		
         debugtext = (TextView) findViewById(R.id.debugfield);
-        buttonStart = (Button) findViewById(R.id.buttonStart); 
-
+        buttonStart = (Button) findViewById(R.id.buttonStart);
+        textStatus = (TextView) findViewById(R.id.textStatus);
+        textColor = (TextView) findViewById(R.id.textColor);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
         buttonStart.setTag("stopped");
         buttonStart.setOnClickListener(startListener);
     }
@@ -100,10 +110,14 @@ public class SmartyPantsActivity extends Activity implements Runnable, OnClickLi
 				buttonStart.setText("Stop game!");
 				buttonStart.setTag("started");
 				Log.i(TAG, "Game started!");
+				startColorChanging();				
 			} else if (buttonStart.getTag() == "started") {
 				buttonStart.setText("Start game!");
 				buttonStart.setTag("stopped");
 				Log.i(TAG, "Game stopped!");
+				mHandler.removeCallbacks(mWaitRunnable);
+				textColor.setText("COLOR");
+				textColor.setTextColor(Color.BLACK);
 			}
 		}
     };
@@ -131,6 +145,67 @@ public class SmartyPantsActivity extends Activity implements Runnable, OnClickLi
 			}
 		} else {
 			Log.d(TAG, "mAccessory is null");
+		}
+	}
+	
+	private Handler mHandler = new Handler();
+	private Runnable mWaitRunnable = new Runnable() {
+	    public void run() {
+	    	Random rnd = new Random();
+	    	int i = rnd.nextInt(3);
+	    	if(i == 0) {
+	    		textColor.setText("RED");
+	    	}
+	    	else if(i == 1) {
+	    		textColor.setText("BLUE");
+	    	}
+	    	else if(i == 2) {
+	    		textColor.setText("GREEN");
+	    	}
+	    	int j = rnd.nextInt(3);
+	    	if(j == 0) {
+	    		textColor.setTextColor(Color.RED);
+	    		whatColor = "RED";
+	    	}
+	    	else if(j == 1) {
+	    		textColor.setTextColor(Color.BLUE);
+	    		whatColor = "BLUE";
+	    	}
+	    	else if(j == 2) {
+	    		textColor.setTextColor(Color.GREEN);
+	    		whatColor = "GREEN";
+	    	}
+	    	
+	    	mHandler.postDelayed(mWaitRunnable, 3000);
+	    }
+	};
+	
+	private void startColorChanging() {
+		mHandler.postDelayed(mWaitRunnable, 3000);
+	}
+	
+	private void handleInput(String in) {
+		if(in.equals(whatColor)) {
+			int i = progressBar.getProgress();
+			i += 1;
+			progressBar.setProgress(i);
+		}
+		else {
+			int i = progressBar.getProgress();
+			i -= 1;
+			progressBar.setProgress(i);
+		}
+		if(progressBar.getProgress() < 250) {
+			textStatus.setText("Hohlbirne");
+		}
+		else if(progressBar.getProgress() >= 250 && progressBar.getProgress() < 500) {
+			textStatus.setText("Schwammerl");
+		}
+		else if(progressBar.getProgress() >= 500 && progressBar.getProgress() < 750) {
+			textStatus.setText("Birne");
+		}
+		else if(progressBar.getProgress() >= 750) {
+			textStatus.setText("Smartbirne");
 		}
 	}
 
@@ -214,8 +289,7 @@ public class SmartyPantsActivity extends Activity implements Runnable, OnClickLi
 
 	@Override
 	public void onClick(View v) {
-		// Send some message to Arduino board, e.g. "13"
-//		sendCommand((byte)13);
+
 	}
 	
 	// Instantiating the Handler associated with the main thread.
@@ -227,7 +301,18 @@ public class SmartyPantsActivity extends Activity implements Runnable, OnClickLi
 				case MESSAGE_BUTTON_PRESSED:
 					try {  
 			        	byte load = (Byte) msg.obj; 
-			        	debugtext.setText("Received message: " + String.valueOf(load));
+			        	
+			        	// handle input and send color string to handleInput
+			        	if (load == 13) {
+			        		handleInput("RED");
+			        		debugtext.setText("RED button pressed.");
+			        	} else if (load == 8) {
+			        		handleInput("GREEN");
+			        		debugtext.setText("GREEN button pressed.");
+			        	} else if (load == 4) {
+			        		handleInput("BLUE");
+			        		debugtext.setText("BLUE button pressed.");
+			        	}
 		            } catch (Exception e) {
 		            }
 		            break;
